@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS users (
+    tg_id BIGINT PRIMARY KEY,
+    phone TEXT,
+    lat DOUBLE PRECISION,
+    lon DOUBLE PRECISION
+);
