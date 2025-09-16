@@ -1,5 +1,5 @@
 aiogram==2.25.1
-fastapi
-uvicorn
-asyncpg
-aiohttp
+Flask==2.2.5
+waitress==2.1.2
+psycopg2-binary==2.9.9
+aiohttp==3.8.6
