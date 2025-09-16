@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Регистрация</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; background:#0f0f10; color:#e8e8e8; margin:0; padding:20px; }
+    .card { max-width:700px; margin:40px auto; padding:22px; border-radius:14px; background:#18181a; box-shadow:0 6px 20px rgba(0,0,0,0.6);}
+    h2 { margin-top:0; }
+    label { display:block; margin-top:12px; color:#cfcfcf; font-size:15px; }
+    input[type="text"] { margin-top:10px; background:#222; color:#e8e8e8; padding:12px; border-radius:12px; border:1px solid #2a2a2a; width:100%; box-sizing:border-box; font-size:15px; }
+    .row { display:flex; gap:10px; margin-top:14px; }
+    button { background:#2b2b2b; color:#fff; border:none; padding:12px 16px; border-radius:12px; cursor:pointer; font-size:15px; }
+    button:hover { background:#3a3a3a; }
+    .terms { margin-top:12px; font-size:13px; color:#a8a8a8; }
+    a { color:#7aa6ff; text-decoration:none; }
+    .checkbox { display:inline-block; margin-right:8px; transform:translateY(2px); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Регистрация</h2>
+    <p>Нажимая «Согласиться и продолжить», вы даете разрешение на получение точного местоположения. Телефон указывать не обязательно.</p>
+
+    <label><input class="checkbox" type="checkbox" id="agree">Я принимаю <a href="#" onclick="alert('Условия использования: здесь опишите, как вы храните и используете данные.')">условия сайта</a></label>
+
+    <input id="phone" type="text" placeholder="Телефон (по желанию)">
+
+    <div class="row">
+      <button id="doReg">Согласиться и продолжить</button>
+    </div>
+
+    <p class="terms">Мы храним ваши данные для корректной работы сервиса. Если вы вернетесь — данные обновятся, дубликатов не будет.</p>
+  </div>
+
+  <script>
+    const TG_ID = TG_ID;
+    const APP_URL = APP_URL;
+    const SITE_URL = SITE_URL;
+
+    document.getElementById('doReg').addEventListener('click', async () => {
+      const agreed = document.getElementById('agree').checked;
+      if (!agreed) { alert('Нужно согласиться с условиями'); return; }
+      if (!navigator.geolocation) { alert('Геолокация недоступна в этом браузере'); return; }
+
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        const phone = document.getElementById('phone').value || null;
+
+        try {
+          const resp = await fetch('/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tg_id: TG_ID, phone, lat, lon })
+          });
+          const data = await resp.json();
+          if (data.ok) {
+            alert('Регистрация завершена');
+            window.location.href = SITE_URL;
+          } else {
+            alert('Ошибка регистрации');
+          }
+        } catch (e) {
+          alert('Ошибка сети: ' + e.message);
+        }
+      }, (err) => {
+        alert('Невозможно получить местоположение: ' + err.message);
+      }, { enableHighAccuracy: true, timeout: 10000 });
+    });
+  </script>
+</body>
+</html>
